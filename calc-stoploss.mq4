@@ -13,12 +13,18 @@
 
 int getPipsForCurrentCurrency()
 {
+   printf(Symbol(), " is the symbol");
    if(Symbol() == "XAUUSD"){
-      printf("stop loss is: 250");
-      return(200);
+      return(250);
    }
-   printf("stop loss is: 200");
-  return(200);
+   if(Symbol() == "BTCUSD"){
+      return(20000);
+   }
+    if(Symbol() == "US30"){
+      printf("stop loss is: 250");
+      return(2000);
+   }
+  return(100);
 }
 
 int InpStopLossPoints = getPipsForCurrentCurrency();  // Stop loss in points
@@ -41,14 +47,36 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
-void OnTick()
-  {
+void OnTick() {
   
+  CloseExcessOrders();
+  CalculateStopLoss();
+
+ }
+  
+void CloseExcessOrders() {
+  int total = OrdersTotal();
+  
+  // Runs when total orders are more than 10
+  if (total > 10){
+       Alert("Total orders are: ",total);
+  
+       bool currOrder = OrderSelect(total - 1, SELECT_BY_POS, MODE_TRADES);
+       int needleTicket = OrderTicket();
+       if (currOrder && OrderClose(needleTicket,OrderLots(), OrderClosePrice(), OrderType())) {
+         Alert("Order with ticket ID: " , needleTicket, " Closed!!");
+         return;
+       }
+       Alert("Order with ticket ID: " , needleTicket, " Was not closed");
+  }
+}
+
+void CalculateStopLoss(){
   datetime checkTime = TimeCurrent()-10;
   
   int cnt = OrdersTotal();
   
-  printf(IntegerToString(InpStopLossPoints));
+  // printf(IntegerToString(InpStopLossPoints));
   
   for (int i=cnt-1; i>=0; i--) {
      if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
@@ -65,4 +93,6 @@ void OnTick()
          }
       }
    }
-  }
+
+}
+  
