@@ -48,9 +48,11 @@ void OnDeinit(const int reason)
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
+  
   CloseExcessOrders();
   CalculateStopLoss();
   MoveStopLoss();
+
  }
   
 void CloseExcessOrders() {
@@ -90,8 +92,10 @@ void CalculateStopLoss(){
          }
       }
    }
-}
+   
 
+
+}
 void MoveStopLoss(){
   int acctProfit = AccountProfit();
   int cnt = OrdersTotal();
@@ -111,11 +115,11 @@ void MoveStopLoss(){
                                        OrderOpenPrice()-stopLoss;
             stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
             if (OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {}
-         }
-         //sleep for 1 minute
-         Sleep(60000); 
+         } 
        }
     }
+   //sleep for 1 minute
+   Sleep(60000);
 }
 
   
