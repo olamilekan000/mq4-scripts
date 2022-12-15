@@ -48,10 +48,9 @@ void OnDeinit(const int reason)
 //| Expert tick function                                             |
 //+------------------------------------------------------------------+
 void OnTick() {
-  
   CloseExcessOrders();
   CalculateStopLoss();
-
+  MoveStopLoss();
  }
   
 void CloseExcessOrders() {
@@ -75,24 +74,48 @@ void CalculateStopLoss(){
   datetime checkTime = TimeCurrent()-10;
   
   int cnt = OrdersTotal();
-  
+
   // printf(IntegerToString(InpStopLossPoints));
   
-  for (int i=cnt-1; i>=0; i--) {
-     if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
-         if (OrderMagicNumber()==0 && OrderStopLoss()==0
-               && (OrderType()==ORDER_TYPE_BUY || OrderType()==ORDER_TYPE_SELL)) {
-            if (OrderOpenTime()>checkTime) {
-               double   stopLoss       =  InpStopLossPoints*SymbolInfoDouble(OrderSymbol(), SYMBOL_POINT);
-               double   stopLossPrice  =  (OrderType()==ORDER_TYPE_BUY) ?
-                                          OrderOpenPrice()-stopLoss :
-                                          OrderOpenPrice()+stopLoss;
-               stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
-               if (OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {}
-            }
+  for (int x=0;x<=cnt; x++) {
+     if (OrderSelect(x, SELECT_BY_POS, MODE_TRADES)) {
+          if (OrderStopLoss()==0 && (OrderType()==ORDER_TYPE_BUY || OrderType()==ORDER_TYPE_SELL)) {
+            // if (OrderOpenTime()>checkTime) {}
+            double   stopLoss       =  InpStopLossPoints*SymbolInfoDouble(OrderSymbol(), SYMBOL_POINT);
+            double   stopLossPrice  =  (OrderType()==ORDER_TYPE_BUY) ?
+                                       OrderOpenPrice()-stopLoss :
+                                       OrderOpenPrice()+stopLoss;
+            stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
+            if (OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {}
          }
       }
    }
-
 }
+
+void MoveStopLoss(){
+  int acctProfit = AccountProfit();
+  int cnt = OrdersTotal();
+  int STOP_WHEN = 20;
+ 
+  if(cnt = 0){
+   STOP_WHEN = 20;
+  }
+  
+   if (acctProfit > STOP_WHEN){
+      Alert("Balance now +20");
+       for (int x=0;x<=cnt; x++) {
+          if (OrderSelect(x, SELECT_BY_POS, MODE_TRADES)) {
+            double   stopLoss       =  10*SymbolInfoDouble(OrderSymbol(), SYMBOL_POINT);
+            double   stopLossPrice  =  (OrderType()==ORDER_TYPE_BUY) ?
+                                       OrderOpenPrice()+stopLoss :
+                                       OrderOpenPrice()-stopLoss;
+            stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
+            if (OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {}
+         }
+         //sleep for 1 minute
+         Sleep(60000); 
+       }
+    }
+}
+
   
