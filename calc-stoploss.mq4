@@ -31,7 +31,7 @@ int getPipsForCurrentCurrency(){
 }
 
 int InpStopLossPoints = getPipsForCurrentCurrency();  // Stop loss in points
-int MaxOrderCount = 10;  // Stop loss in points
+int MaxOrderCount = 10;  // max order that can be placed
 
 int OnInit(){
   return(INIT_SUCCEEDED);
