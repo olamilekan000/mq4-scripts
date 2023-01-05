@@ -102,21 +102,20 @@ void MoveStopLoss(){
   }
   
    if (acctProfit > STOP_WHEN){ // move stoploss to breakeven when in profit
-       for (int x=0;x<=cnt; x++) {
-            //Alert("Balance now +20 ", x);
-          if (OrderSelect(x, SELECT_BY_POS, MODE_TRADES)) {
-            double stopLoss       =  INCR_SL*SymbolInfoDouble(OrderSymbol(), SYMBOL_POINT);
-            double stopLossPrice  =  (OrderType() == ORDER_TYPE_BUY) ? OrderOpenPrice() + stopLoss : OrderOpenPrice() - stopLoss;
-            stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
-   
-            if (OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {
-            
-            }else{
-             Print("order not modified ", GetLastError());
-            }
-         } 
-       }
-       INCR_SL = INCR_SL +2; // move stoploss by 2 pips
+      for (int x=0;x<=cnt; x++) {
+          //Alert("Balance now +20 ", x);
+        if (OrderSelect(x, SELECT_BY_POS, MODE_TRADES)) {
+          double stopLoss       =  INCR_SL*SymbolInfoDouble(OrderSymbol(), SYMBOL_POINT);
+          double stopLossPrice  =  (OrderType() == ORDER_TYPE_BUY) ? OrderOpenPrice() + stopLoss : OrderOpenPrice() - stopLoss;
+          stopLossPrice = NormalizeDouble(stopLossPrice, (int)SymbolInfoInteger(OrderSymbol(), SYMBOL_DIGITS));
+  
+          if (!OrderModify(OrderTicket(), OrderOpenPrice(), stopLossPrice, OrderTakeProfit(), OrderExpiration())) {
+            Print("order not modified ", GetLastError());
+          }
+        } 
+      }
+
+      INCR_SL = INCR_SL +2; // move stoploss by 2 pips
     }
    //sleep for 1 minute
    //Sleep(60000);
