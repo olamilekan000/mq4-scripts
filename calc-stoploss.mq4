@@ -121,4 +121,19 @@ void MoveStopLoss(){
    //Sleep(60000);
 }
 
+void CloseEntryByLotSize(){
+   double PREDEFINED_LOT_SIZE = 0.10;
+
+    for (int i = 0; i < OrdersTotal(); i++) {
+        if (OrderSelect(i, SELECT_BY_POS, MODE_TRADES)) {
+            if (OrderType() == OP_BUY || OrderType() == OP_SELL) {
+                double lot_size = OrderLots();
+                if (lot_size > PREDEFINED_LOT_SIZE) {
+                    OrderClose(OrderTicket(), lot_size, MarketInfo(OrderSymbol(), MODE_BID), 3, Red);
+                }
+            }
+        }
+    }
+}
+
   
